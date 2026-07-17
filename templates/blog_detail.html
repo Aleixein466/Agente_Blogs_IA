@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="dashboard-shell">
+  {% if blog %}
+  <header class="dashboard-topbar">
+    <div>
+      <p class="eyebrow mb-2">{{ blog.niche }}</p>
+      <h2 class="page-title">{{ blog.title }}</h2>
+      <p class="page-subtitle">{{ blog.metadata_json.get("seo_description", blog.brief) }}</p>
+    </div>
+    <div class="topbar-actions">
+      <a class="topbar-pill topbar-link" target="_blank" href="/preview/{{ blog.slug }}">Vista previa</a>
+      <a class="topbar-pill topbar-link" href="/api/blogs/{{ blog.id }}/export">ZIP</a>
+      <button id="delete-btn" class="topbar-pill topbar-danger" data-blog-id="{{ blog.id }}" data-csrf="{{ csrf_token }}">Eliminar</button>
+    </div>
+  </header>
+
+  <div id="detail-status" class="alert alert-secondary d-none"></div>
+
+  <div class="dashboard-grid detail-grid-layout">
+    <section class="workspace-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow mb-1">Editor conversacional</p>
+          <h3>Refinar el blog</h3>
+        </div>
+        <span class="panel-badge">Versionado activo</span>
+      </div>
+      <textarea id="instruction-input" class="form-control dashboard-textarea" rows="10" placeholder="Reescribe el hero, vuelve el tono mas editorial y agrega un bloque con selecciones favoritas"></textarea>
+      <div class="voice-stack inline-actions">
+        <button id="voice-instruction-btn" class="voice-action" type="button">Grabar instruccion</button>
+        <button id="edit-btn" class="primary-action" data-blog-id="{{ blog.id }}" data-csrf="{{ csrf_token }}">Aplicar cambios</button>
+        <button id="publish-btn" class="secondary-action" data-blog-id="{{ blog.id }}" data-csrf="{{ csrf_token }}">Publicar</button>
+      </div>
+    </section>
+
+    <section class="library-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow mb-1">Vista actual</p>
+          <h3>Version en trabajo</h3>
+        </div>
+        {% if blog.current_version %}
+        <span class="panel-badge">v{{ blog.current_version.version_number }}</span>
+        {% endif %}
+      </div>
+      {% if blog.current_version %}
+      <p class="blog-list-copy"><strong>Resumen:</strong> {{ blog.current_version.change_summary }}</p>
+      <div class="preview-shell">
+        <iframe src="/preview/{{ blog.slug }}" title="Vista previa del blog"></iframe>
+      </div>
+      {% else %}
+      <div class="empty-state sleek-empty">
+        <h3>No hay version activa</h3>
+        <p>Genera una nueva iteracion para ver el preview aqui mismo.</p>
+      </div>
+      {% endif %}
+    </section>
+  </div>
+  {% else %}
+  <div class="empty-state sleek-empty">
+    <h3>Blog no encontrado</h3>
+    <p>Vuelve al dashboard para crear o seleccionar otro proyecto.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

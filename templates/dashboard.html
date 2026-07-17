@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="dashboard-shell">
+  <header class="dashboard-topbar">
+    <div>
+      <p class="eyebrow mb-2">Centro de control</p>
+      <h2 class="page-title">Dashboard</h2>
+      <p class="page-subtitle">Genera, edita y publica blogs con una capa visual mas limpia y control de voz desde el backend.</p>
+    </div>
+    <div class="topbar-actions">
+      <div class="search-card">
+        <span>Buscar</span>
+        <input type="text" placeholder="Filtra por tema o nicho">
+      </div>
+      <div class="topbar-pill">{{ username }}</div>
+    </div>
+  </header>
+
+  <div class="metric-row">
+    <article class="hero-metric accent-pink">
+      <span>Total blogs</span>
+      <strong>{{ total_blogs }}</strong>
+      <p>Base acumulada de proyectos generados</p>
+    </article>
+    <article class="hero-metric accent-blue">
+      <span>Publicados</span>
+      <strong>{{ published_blogs }}</strong>
+      <p>Blogs listos para compartir</p>
+    </article>
+    <article class="hero-metric accent-cyan">
+      <span>Versiones</span>
+      <strong>{{ total_versions }}</strong>
+      <p>Historial total de iteraciones</p>
+    </article>
+    <article class="hero-metric accent-gold" id="voice">
+      <span>Voz IA</span>
+      <strong>STT / TTS</strong>
+      <p>Faster-Whisper y Kokoro conectados desde el panel</p>
+    </article>
+  </div>
+
+  <div id="status-box" class="alert alert-secondary d-none"></div>
+
+  <div class="dashboard-grid dashboard-stack-grid">
+    <section class="workspace-panel" id="workspace">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow mb-1">Quick Draft</p>
+          <h3>Crear un blog desde cero</h3>
+        </div>
+        <span class="panel-badge">Prompt + voz</span>
+      </div>
+      <div class="crud-toolbar quickdraft-crud-toolbar">
+        <div class="crud-toolbar-left">
+          <span class="crud-pill active">Nuevo blog</span>
+          <span class="crud-pill">Con audio</span>
+          <span class="crud-pill">Con referencias</span>
+        </div>
+        <div class="crud-toolbar-right">
+          <span class="crud-count">Modo rapido</span>
+        </div>
+      </div>
+      <div class="quickdraft-shell quickdraft-crud-shell">
+        <div class="quickdraft-main">
+          <div class="quickdraft-head-row">
+            <label class="panel-label">Prompt del blog</label>
+            <span class="draft-inline-note">Describe tema, enfoque, publico y tono</span>
+          </div>
+          <textarea id="prompt-input" class="form-control dashboard-textarea" rows="7" placeholder="Crea un blog sobre el Mundial 2026, que selecciones van a jugar, las fechas clave y las sedes principales"></textarea>
+          <div class="quickdraft-toolbar">
+            <button id="voice-prompt-btn" class="voice-action" type="button">Grabar voz</button>
+            <button id="generate-btn" class="primary-action" data-csrf="{{ csrf_token }}">Crear blog</button>
+          </div>
+        </div>
+        <aside class="quickdraft-side">
+          <article class="hint-card compact-hint">
+            <strong>Plantillas tematicas</strong>
+            <p>El sistema intenta que cada blog nazca centrado en el tema pedido y no en plantillas heredadas.</p>
+          </article>
+          <article class="hint-card compact-hint">
+            <strong>Voz backend</strong>
+            <p>El prompt puede dictarse por microfono y la confirmacion se reproduce con TTS cuando el blog queda listo.</p>
+          </article>
+          <article class="hint-card compact-hint accent-hint">
+            <strong>Consejo</strong>
+            <p>Pide tema, enfoque, publico e incluye si quieres referencias, imagenes y tono editorial.</p>
+          </article>
+        </aside>
+      </div>
+      <div class="quickdraft-glance">
+        <span>Prompt</span>
+        <span>Voz</span>
+        <span>Generacion</span>
+        <span>Edicion</span>
+        <span>Publicacion</span>
+      </div>
+    </section>
+
+    <section class="library-panel" id="library">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow mb-1">Biblioteca</p>
+          <h3>Blogs recientes</h3>
+        </div>
+        <span class="panel-badge">{{ recent_blogs|length }} visibles</span>
+      </div>
+      <div class="crud-toolbar library-toolbar">
+        <div class="crud-toolbar-left">
+          <span class="crud-pill active">Todos</span>
+          <span class="crud-pill">Draft</span>
+          <span class="crud-pill">Published</span>
+        </div>
+        <div class="crud-toolbar-right">
+          <span class="crud-count">CRUD horizontal</span>
+        </div>
+      </div>
+      <div class="library-crud-head">
+        <span>ID</span>
+        <span>Blog</span>
+        <span>Nicho</span>
+        <span>Estado</span>
+        <span>Resumen</span>
+        <span>Acciones</span>
+      </div>
+      <div class="recent-blog-list horizontal-crud-list">
+        {% for blog in recent_blogs %}
+        <article class="blog-list-card horizontal-card">
+          <div class="blog-col blog-col-id">
+            <span class="row-id">{{ blog.id }}</span>
+          </div>
+          <div class="blog-col blog-col-title">
+            <h4>{{ blog.title }}</h4>
+            <p class="blog-mini-meta">{{ blog.slug }}</p>
+          </div>
+          <div class="blog-col blog-col-niche">
+            <span class="niche-chip">{{ blog.niche }}</span>
+          </div>
+          <div class="blog-col blog-col-status">
+            <span class="status-chip">{{ blog.status }}</span>
+          </div>
+          <p class="blog-col blog-list-copy">{{ blog.metadata_json.get("seo_description", blog.brief) }}</p>
+          <div class="blog-col blog-list-actions horizontal-actions">
+            <a class="mini-link" href="/blogs/{{ blog.id }}">Editar</a>
+            <a class="mini-link" target="_blank" href="/preview/{{ blog.slug }}">Preview</a>
+            <a class="mini-link" href="/api/blogs/{{ blog.id }}/export">ZIP</a>
+            <button class="mini-link danger delete-blog-btn" data-blog-id="{{ blog.id }}" data-csrf="{{ csrf_token }}">Eliminar</button>
+          </div>
+        </article>
+        {% else %}
+        <div class="empty-state sleek-empty">
+          <h3>No hay blogs todavia</h3>
+          <p>Empieza creando uno desde el bloque de trabajo rapido.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</section>
+{% endblock %}

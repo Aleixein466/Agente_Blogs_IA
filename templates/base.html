@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "BlogBot IA" }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-mark">BB</div>
+        <div>
+          <p class="sidebar-eyebrow">Studio</p>
+          <h1>BlogBot IA</h1>
+        </div>
+      </div>
+      <div class="sidebar-profile">
+        <div class="avatar-orb">{{ (request.session.get("user") or "A")[0]|upper }}</div>
+        <div>
+          <strong>{{ request.session.get("user") or "admin" }}</strong>
+          <p>Panel creativo de blogs y voz</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="/dashboard" class="sidebar-link">Dashboard</a>
+        <a href="/dashboard#workspace" class="sidebar-link">Crear blog</a>
+        <a href="/dashboard#library" class="sidebar-link">Biblioteca</a>
+        <a href="/dashboard#voice" class="sidebar-link">Voz IA</a>
+        <a href="/logout" class="sidebar-link sidebar-link-danger">Salir</a>
+      </nav>
+      <div class="sidebar-note">
+        <p class="sidebar-eyebrow">Modo actual</p>
+        <p>Generacion visual, edicion guiada y voz backend con STT/TTS.</p>
+      </div>
+    </aside>
+    <div class="admin-main">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

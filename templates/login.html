@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login | BlogBot IA</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="login-shell">
+  <main class="login-card">
+    <h1>BlogBot IA</h1>
+    <p>Administra blogs creados desde Telegram y Ollama.</p>
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="/login">
+      <div class="mb-3">
+        <label class="form-label">Usuario</label>
+        <input class="form-control" name="username" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Contrasena</label>
+        <input class="form-control" type="password" name="password" required>
+      </div>
+      <button class="btn btn-success w-100" type="submit">Ingresar</button>
+    </form>
+  </main>
+</body>
+</html>
